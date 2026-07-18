@@ -14,7 +14,7 @@ from src.rl_agent import DQNNet
 
 # Set page configuration
 st.set_page_config(
-    page_title="Intelligent Customer Behavior Analysis Dashboard",
+    page_title="Customer Insights Dashboard",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -173,34 +173,37 @@ if model_loading_success:
     # -------------------------------------------------------------
     st.sidebar.markdown("""
     <div style='padding-bottom: 20px;'>
-        <h2 style='margin-bottom: 0;'>⚙️ Control Panel</h2>
-        <p style='opacity: 0.7; font-size: 14px; margin-top: 5px;'>Configure simulation parameters</p>
+        <h2 style='margin-bottom: 0;'>⚙️ Settings</h2>
+        <p style='opacity: 0.7; font-size: 14px; margin-top: 5px;'>Choose a customer and adjust the options below to explore insights.</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Customer Selector
     customer_ids = sorted(df_customers['CustomerID'].unique())
-    selected_id = st.sidebar.selectbox("👤 Select Customer ID", customer_ids)
+    selected_id = st.sidebar.selectbox("👤 Pick a Customer", customer_ids)
     
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
     
     # Toggle PCA vs LDA Scatter Plot
-    pca_lda_toggle = st.sidebar.radio("📊 Dimensionality Reduction Visual", ["PCA (Principal Component Analysis)", "LDA (Linear Discriminant Analysis)"])
+    pca_lda_toggle = st.sidebar.radio("📊 Customer Overview Chart Style", ["PCA (Principal Component Analysis)", "LDA (Linear Discriminant Analysis)"])
+    st.sidebar.caption("Choose how to display the customer comparison chart.")
     
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
     
     # Toggle Classifier/Regressor Model Diagnostics
-    diagnostic_toggle = st.sidebar.radio("🔎 Model Diagnostic Panel", ["Classification", "Regression", "Reinforcement Learning"])
+    diagnostic_toggle = st.sidebar.radio("🔎 View Model Performance", ["Classification", "Regression", "Reinforcement Learning"])
+    st.sidebar.caption("See how accurate our predictions are for different tasks.")
     
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
     
     # RL Policy Selector
-    rl_policy = st.sidebar.selectbox("🤖 RL Campaign Policy", ["Deep Q-Network (DQN)", "Tabular Q-Learning", "Random Policy", "Always No Action"])
+    rl_policy = st.sidebar.selectbox("🤖 Marketing Strategy Method", ["Deep Q-Network (DQN)", "Tabular Q-Learning", "Random Policy", "Always No Action"])
+    st.sidebar.caption("Select which AI method to use for generating the best marketing suggestion.")
     
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
     
     # Run Analysis Button
-    run_btn = st.sidebar.button("🚀 Run Simulation Campaign")
+    run_btn = st.sidebar.button("🚀 Run Marketing Simulation")
     
     # Get details of selected customer
     cust_row = df_customers[df_customers['CustomerID'] == selected_id].iloc[0]
@@ -210,13 +213,14 @@ if model_loading_success:
     # -------------------------------------------------------------
     st.markdown("""
     <div style='text-align: center; padding: 40px 0 20px 0;'>
-        <h1 style='font-size: 42px; margin-bottom: 10px;'>Intelligent <span class='gradient-text'>Customer Behavior</span> Analysis</h1>
-        <p style='opacity: 0.7; font-size: 18px; max-width: 800px; margin: 0 auto;'>Interactive Customer-Centric Decisions using Machine Learning & Reinforcement Learning</p>
+        <h1 style='font-size: 42px; margin-bottom: 10px;'>🛍️ <span class='gradient-text'>Customer Insights</span> Dashboard</h1>
+        <p style='opacity: 0.7; font-size: 18px; max-width: 800px; margin: 0 auto;'>Understand your customers better — see who they are, how much they spend, and what marketing offer works best for them.</p>
     </div>
     """, unsafe_allow_html=True)
     
     # SECTION 1: CUSTOMER SUMMARY METRICS (TOP ROW)
-    st.markdown("<h3 style='margin-bottom: 20px;'>Customer Profile Summary</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='margin-bottom: 4px;'>👤 Customer Snapshot</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='opacity:0.6; font-size:14px; margin-bottom:20px;'>A quick summary of this customer's shopping history — how recently they bought, how often, and how much they spent in total.</p>", unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
@@ -225,9 +229,9 @@ if model_loading_success:
     with col1:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-title">⏱️ Recency</div>
+            <div class="metric-title">⏱️ Last Purchase</div>
             <div class="metric-value">{rec_val} Days</div>
-            <div class="metric-sub">Since last transaction</div>
+            <div class="metric-sub">Days since last purchase</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -236,9 +240,9 @@ if model_loading_success:
     with col2:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-title">🛒 Frequency</div>
+            <div class="metric-title">🛒 Total Orders</div>
             <div class="metric-value">{freq_val} Orders</div>
-            <div class="metric-sub">Total unique invoices</div>
+            <div class="metric-sub">Number of times they bought</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -247,9 +251,9 @@ if model_loading_success:
     with col3:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-title">💰 Monetary</div>
+            <div class="metric-title">💰 Total Spent</div>
             <div class="metric-value" style="color:#22C55E;">${mon_val:,.2f}</div>
-            <div class="metric-sub">Cumulative total spend</div>
+            <div class="metric-sub">All-time total amount spent</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -261,9 +265,9 @@ if model_loading_success:
     with col4:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-title">{seg_icon} Value Segment</div>
+            <div class="metric-title">{seg_icon} Customer Tier</div>
             <div class="metric-value" style="color:{seg_color}; font-size: 24px; padding-top: 8px;">{seg_name}</div>
-            <div class="metric-sub">Based on top 20% spend threshold</div>
+            <div class="metric-sub">Based on spending compared to all customers</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -273,13 +277,53 @@ if model_loading_success:
     mid_col_left, mid_col_right = st.columns([3, 2])
     
     with mid_col_left:
-        st.markdown("<h3 style='margin-top:0; margin-bottom: 20px;'>🌌 Customer Space Projection</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin-top:0; margin-bottom: 4px;'>📊 Customer Overview</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='opacity:0.6; font-size:14px; margin-bottom:16px;'>This chart groups customers with similar shopping habits together. Each dot is a customer — <span style='color:#22C55E; font-weight:600;'>green</span> dots are high-value customers, and the <span style='color:#EF4444; font-weight:600;'>red star ★</span> is the selected customer.</p>", unsafe_allow_html=True)
         
         # Plot PCA/LDA Space
+        # ── Robust theme detection ──────────────────────────────────────────
+        # Priority: theme.base  →  theme.backgroundColor luminance
+        # →  theme.textColor luminance  →  default dark
+        def _resolve_is_dark() -> bool:
+            try:
+                base = st.get_option("theme.base")
+                if base == "light":
+                    return False
+                if base == "dark":
+                    return True
+                # base is None (System/unset): inspect actual colors
+                def _hex_luminance(hex_color: str) -> float:
+                    h = hex_color.lstrip("#")
+                    if len(h) == 3:
+                        h = "".join(c * 2 for c in h)
+                    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+                    return (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+
+                bg = st.get_option("theme.backgroundColor")
+                if bg:
+                    return _hex_luminance(bg) < 0.5   # dark bg  → dark mode
+
+                txt = st.get_option("theme.textColor")
+                if txt:
+                    return _hex_luminance(txt) >= 0.5  # light txt → dark mode
+            except Exception:
+                pass
+            return True   # safe default: dark
+
+        _is_dark     = _resolve_is_dark()
+        _text_color  = "#F1F5F9" if _is_dark else "#1E293B"
+        _muted_color = "#94A3B8" if _is_dark else "#475569"
+        _spine_color = "#334155" if _is_dark else "#CBD5E1"
+        _legend_face = "#1E293B" if _is_dark else "#FFFFFF"
+        _fig_face    = "#0F172A" if _is_dark else "#FFFFFF"
+        _ax_face     = "#1E293B" if _is_dark else "#F8FAFC"
+        _grid_color  = "#334155" if _is_dark else "#E2E8F0"
+        # ────────────────────────────────────────────────────────────────────
+
         fig, ax = plt.subplots(figsize=(8, 5.5))
-        fig.patch.set_alpha(0.0)
-        ax.patch.set_alpha(0.0)
-        
+        fig.patch.set_facecolor(_fig_face)
+        ax.set_facecolor(_ax_face)
+
         cat_cols = [c for c in df_customers.columns if c.endswith('_Spend_Pct')]
         # Extract and scale current customer's category spend
         current_cats = cust_row[cat_cols].values.reshape(1, -1)
@@ -289,14 +333,14 @@ if model_loading_success:
             # We already have PC1 and PC2 in df_customers! Let's plot them.
             sns.scatterplot(
                 data=df_customers, x='PC1', y='PC2', hue='High_Value', 
-                palette={0: 'gray', 1: '#22C55E'}, alpha=0.4, ax=ax
+                palette={0: _muted_color, 1: '#22C55E'}, alpha=0.4, ax=ax
             )
             # Project current customer
             cur_pc = pca.transform(current_cats_scaled)[0]
-            ax.scatter(cur_pc[0], cur_pc[1], color='#EF4444', marker='*', s=400, edgecolor='gray', zorder=10, label='Selected Customer')
-            ax.set_title("Customer Positioning in PCA Space (Category Preference)", )
-            ax.set_xlabel("PC1 (Principal Component 1)")
-            ax.set_ylabel("PC2 (Principal Component 2)")
+            ax.scatter(cur_pc[0], cur_pc[1], color='#EF4444', marker='*', s=400, edgecolor=_text_color, zorder=10, label='Selected Customer')
+            ax.set_title("Customer Positioning in PCA Space (Category Preference)", color=_text_color, fontsize=12, pad=12)
+            ax.set_xlabel("PC1 (Principal Component 1)", color=_muted_color, fontsize=10)
+            ax.set_ylabel("PC2 (Principal Component 2)", color=_muted_color, fontsize=10)
         else:
             # LDA: Let's project category spend using the LDA model.
             # LDA projects to 1D because it separates binary classes.
@@ -309,26 +353,34 @@ if model_loading_success:
             
             sns.scatterplot(
                 data=temp_df, x='LDA1', y='Monetary', hue='High_Value',
-                palette={0: 'gray', 1: '#22C55E'}, alpha=0.4, ax=ax
+                palette={0: _muted_color, 1: '#22C55E'}, alpha=0.4, ax=ax
             )
             ax.set_yscale('log')
             
             # Project current customer
             cur_lda = lda.transform(current_cats_scaled)[0, 0]
-            ax.scatter(cur_lda, cust_row['Monetary'], color='#EF4444', marker='*', s=400, edgecolor='gray', zorder=10, label='Selected Customer')
-            ax.set_title("Customer Positioning in LDA Space (Supervised Separation)", )
-            ax.set_xlabel("LDA Component 1")
-            ax.set_ylabel("Monetary Spend (Log Scale)")
+            ax.scatter(cur_lda, cust_row['Monetary'], color='#EF4444', marker='*', s=400, edgecolor=_text_color, zorder=10, label='Selected Customer')
+            ax.set_title("Customer Positioning in LDA Space (Supervised Separation)", color=_text_color, fontsize=12, pad=12)
+            ax.set_xlabel("LDA Component 1", color=_muted_color, fontsize=10)
+            ax.set_ylabel("Monetary Spend (Log Scale)", color=_muted_color, fontsize=10)
             
-        ax.legend(facecolor='none', edgecolor='gray')
-        
+        ax.tick_params(colors=_muted_color, which='both')
+        ax.xaxis.label.set_color(_muted_color)
+        ax.yaxis.label.set_color(_muted_color)
+        for lbl in ax.get_xticklabels() + ax.get_yticklabels():
+            lbl.set_color(_muted_color)
+        ax.grid(True, color=_grid_color, linewidth=0.5, alpha=0.7)
+        ax.legend(facecolor=_legend_face, edgecolor=_spine_color, labelcolor=_text_color)
         for spine in ax.spines.values():
-            spine.set_edgecolor('gray')
+            spine.set_edgecolor(_spine_color)
             
         st.pyplot(fig)
+
+
         
     with mid_col_right:
-        st.markdown("<h3 style='margin-top:0;'>🔮 Predictive Modeling Predictions</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin-top:0; margin-bottom: 4px;'>🔮 AI Predictions</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='opacity:0.6; font-size:14px; margin-bottom:16px;'>Our AI has analyzed this customer's history and made two predictions: what type of customer they are, and how much they are likely to spend next.</p>", unsafe_allow_html=True)
         
         # Prepare feature vector for classification and regression models
         # State format: [Recency, Frequency, Monetary, PC1, PC2]
@@ -359,11 +411,11 @@ if model_loading_success:
         st.markdown(f"""
         <div class="glass-card" style="margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h4 style="margin:0;">🎯 High-Value Classifier</h4>
+                <h4 style="margin:0;">🎯 Customer Type</h4>
                 <span style="background: {badge_bg}; {badge_border} padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; {class_color}">{class_label}</span>
             </div>
             <div style="background: rgba(128,128,128,0.1); border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="opacity: 0.7; font-size:14px;">Probability of High Value</span>
+                <span style="opacity: 0.7; font-size:14px;">Likelihood of being a high-value customer</span>
                 <span style="font-size:18px; font-weight:bold; ">{pred_prob*100:.2f}%</span>
             </div>
         </div>
@@ -371,25 +423,25 @@ if model_loading_success:
         
         st.markdown(f"""
         <div class="glass-card" style="margin-bottom: 20px;">
-            <h4 style="margin:0 0 12px 0;">📈 Regressor Spending Forecast</h4>
+            <h4 style="margin:0 0 12px 0;">📈 Predicted Future Spending</h4>
             <div style="font-size:36px; font-weight:bold; color:#06B6D4; margin-bottom: 8px;">${pred_spend:,.2f}</div>
-            <p style="font-size:13px; opacity: 0.7; margin:0;">Predicted customer spend in Months 10-12 based on Months 1-9 transactional history.</p>
+            <p style="font-size:13px; opacity: 0.7; margin:0;">Estimated how much this customer will spend in the next 3 months, based on their past purchases.</p>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown(f"""
         <div class="glass-card" style="padding: 16px;">
-            <h5 style="margin:0 0 12px 0; opacity: 0.7;">Model Confidence Metrics (Unseen Test Set)</h5>
+            <h5 style="margin:0 0 12px 0; opacity: 0.7;">📋 How Accurate Are These Predictions?</h5>
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(128,128,128,0.1); padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="opacity: 0.5; font-size: 13px;">Classifier F1-Score</span>
+                <span style="opacity: 0.5; font-size: 13px;">Customer Type Accuracy</span>
                 <span style="font-weight: 600;  font-size: 13px;">98.2%</span>
             </div>
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(128,128,128,0.1); padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="opacity: 0.5; font-size: 13px;">Regressor R² Score</span>
+                <span style="opacity: 0.5; font-size: 13px;">Spending Prediction Accuracy</span>
                 <span style="font-weight: 600;  font-size: 13px;">84.6%</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
-                <span style="opacity: 0.5; font-size: 13px;">Spend RMSE</span>
+                <span style="opacity: 0.5; font-size: 13px;">Average Prediction Error</span>
                 <span style="font-weight: 600;  font-size: 13px;">$124.50</span>
             </div>
         </div>
@@ -398,7 +450,8 @@ if model_loading_success:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # SECTION 3: REINFORCEMENT LEARNING PANEL
-    st.markdown("<h3 style='margin-top:20px;'>🤖 Reinforcement Learning Campaign Recommendations</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='margin-top:20px; margin-bottom:4px;'>🤖 Best Marketing Suggestion</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='opacity:0.6; font-size:14px; margin-bottom:20px;'>Our AI tested three different marketing options and ranked them by which one is most likely to bring the best results for this customer. The highlighted card is the recommended action.</p>", unsafe_allow_html=True)
     
     # Environment State construction: [Recency, Frequency, Monetary, PC1, PC2]
     # We query Q-values for actions 0, 1, 2
@@ -468,22 +521,22 @@ if model_loading_success:
         badge_html = highlight_badge if highlight_badge else ""
         html_content = f"""<div style="position:relative; {bg_style} {border_style} border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; margin-top: 15px;">
 {badge_html}
-<p style="font-size:13px; opacity: 0.7; font-weight:600; text-transform:uppercase; margin:0 0 8px 0; letter-spacing: 1px;">Action {i}</p>
+<p style="font-size:13px; opacity: 0.7; font-weight:600; text-transform:uppercase; margin:0 0 8px 0; letter-spacing: 1px;">Option {i}</p>
 <h4 style="margin:5px 0 15px 0;  font-size: 20px;">{campaign_name}</h4>
 <div style="background: rgba(128,128,128,0.1); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-<p style="font-size:13px; opacity: 0.7; margin:0 0 4px 0;">Q-Value</p>
+<p style="font-size:13px; opacity: 0.7; margin:0 0 4px 0;">AI Score (higher = better)</p>
 <p style="font-size:28px; font-weight:bold; color:#06B6D4; margin:0;">{q_values[i]:.2f}</p>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 12px; padding-bottom: 8px;">
-<span style="font-size:13px; opacity: 0.5;">Conv. Rate</span>
+<span style="font-size:13px; opacity: 0.5;">Chance of Purchase</span>
 <span style="font-size:14px;  font-weight:600;">{conv_rate}%</span>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; padding-bottom: 8px;">
-<span style="font-size:13px; opacity: 0.5;">Campaign Cost</span>
+<span style="font-size:13px; opacity: 0.5;">Cost to Run</span>
 <span style="font-size:14px;  font-weight:600;">${camp_cost}</span>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 12px;">
-<span style="font-size:13px; opacity: 0.5;">Expected Reward</span>
+<span style="font-size:13px; opacity: 0.5;">Expected Revenue Gain</span>
 <span style="font-size:16px; color:#22C55E; font-weight:bold;">${expected_reward:,.2f}</span>
 </div>
 </div>"""
@@ -493,61 +546,64 @@ if model_loading_success:
             
     # RECOMMENDATION SUMMARY
     rec_text = action_descriptions[chosen_action]
+    campaign_rec_name = action_descriptions[chosen_action].split('(')[0].strip()
     st.markdown(f"""
     <div style="background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); border-left: 4px solid #3B82F6; padding: 20px; border-radius: 0 12px 12px 0; margin-top: 30px; margin-bottom: 20px;">
         <h4 style="margin-top:0;  font-size:16px; display: flex; align-items: center; gap: 8px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            Marketing Recommendation ({policy_name})
+            ✅ Our Recommendation
         </h4>
-        <p style="margin:0; font-size:15px; opacity: 0.8; line-height: 1.6;">The optimal policy prescribes <b>Action {chosen_action}: {rec_text}</b>. This selection maximizes the net customer lifetime value trajectory, balancing the intervention cost against the augmented purchasing probability.</p>
+        <p style="margin:0; font-size:15px; opacity: 0.8; line-height: 1.6;">Based on this customer's profile, the best marketing action is: <b>{campaign_rec_name}</b>. This option gives the highest chance of making a sale while keeping costs low.</p>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
     # SECTION 4: GLOBAL DIAGNOSTIC CHARTS (BOTTOM ACCORDIONS)
-    st.markdown("<h3 style='margin-top:20px; padding-top:20px; border-top: 1px solid rgba(128,128,128,0.2);'>📊 Global Model Performance & Diagnostics</h3>", unsafe_allow_html=True)
-    
-    # Custom styling for tabs via CSS is tricky, but we can rely on Streamlit's default dark mode tabs for now, which look decent.
-    tab_clf, tab_reg, tab_rl = st.tabs(["🛡️ Classifier Diagnostics", "📈 Regressor Diagnostics", "🧠 RL Training Progress"])
+    st.markdown("<h3 style='margin-top:20px; margin-bottom:4px; padding-top:20px; border-top: 1px solid rgba(128,128,128,0.2);'>📊 Model Performance</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='opacity:0.6; font-size:14px; margin-bottom:20px;'>These charts show how well our AI models have been trained. You do not need to understand all the details — just know that higher scores mean more accurate predictions.</p>", unsafe_allow_html=True)
+    tab_clf, tab_reg, tab_rl = st.tabs(["🛡️ Customer Type Model", "📈 Spending Prediction Model", "🧠 Marketing Strategy Model"])
     
     with tab_clf:
-        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>Classifier Diagnostics and Feature Importance</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>How well does the AI identify high-value customers?</h4>", unsafe_allow_html=True)
+        st.caption("The confusion matrix shows which customers the model got right and wrong. Feature Importance shows which factors (like spending amount or number of orders) influenced the result most.")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             if os.path.exists('data/plots/class_confusion_matrix.png'):
-                st.image('data/plots/class_confusion_matrix.png', caption="Confusion Matrix on Test Split", use_column_width=True)
+                st.image('data/plots/class_confusion_matrix.png', caption="Accuracy Chart: Shows how many customers were correctly identified", use_column_width=True)
         with col_c2:
             if os.path.exists('data/plots/feature_importance.png'):
-                st.image('data/plots/feature_importance.png', caption="Random Forest Feature Importance", use_column_width=True)
+                st.image('data/plots/feature_importance.png', caption="What matters most: The factors that most influence whether a customer is high-value", use_column_width=True)
             elif os.path.exists('data/plots/class_roc_curve.png'):
-                st.image('data/plots/class_roc_curve.png', caption="Classifier ROC Curve Comparison", use_column_width=True)
+                st.image('data/plots/class_roc_curve.png', caption="Model Accuracy Curve: Higher and further left = better predictions", use_column_width=True)
                 
     with tab_reg:
-        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>Regressor Spending Forecast Diagnostics</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>How accurate are the spending predictions?</h4>", unsafe_allow_html=True)
+        st.caption("The first chart compares predicted vs. actual spending — dots close to the diagonal line mean more accurate predictions. The second chart shows prediction errors (ideally centered near zero).")
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             if os.path.exists('data/plots/reg_predicted_vs_actual.png'):
-                st.image('data/plots/reg_predicted_vs_actual.png', caption="Predicted vs Actual Spend Scatter Plot", use_column_width=True)
+                st.image('data/plots/reg_predicted_vs_actual.png', caption="Predicted vs. Actual Spending: Dots near the line = accurate predictions", use_column_width=True)
         with col_r2:
             if os.path.exists('data/plots/reg_residuals.png'):
-                st.image('data/plots/reg_residuals.png', caption="Regression Residual Plot", use_column_width=True)
+                st.image('data/plots/reg_residuals.png', caption="Prediction Errors: Shows how far off predictions were (closer to zero = better)", use_column_width=True)
                 
     with tab_rl:
-        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>Reinforcement Learning Policy Comparisons & Rewards</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='opacity: 0.7; margin-top: 10px;'>How well did the AI learn the best marketing strategy?</h4>", unsafe_allow_html=True)
+        st.caption("These charts show how the AI improved over time by trying different marketing actions and learning which ones brought the best results.")
         col_rl1, col_rl2 = st.columns(2)
         with col_rl1:
             if os.path.exists('data/plots/rl_training_rewards.png'):
-                st.image('data/plots/rl_training_rewards.png', caption="Tabular Q-learning vs DQN Reward Progression", use_column_width=True)
+                st.image('data/plots/rl_training_rewards.png', caption="Learning Progress: How the AI improved its marketing decisions over time", use_column_width=True)
         with col_rl2:
             if os.path.exists('data/plots/rl_policy_comparison.png'):
-                st.image('data/plots/rl_policy_comparison.png', caption="Expected Average Reward under Different Policies", use_column_width=True)
+                st.image('data/plots/rl_policy_comparison.png', caption="Strategy Comparison: Which marketing method gets the best results on average", use_column_width=True)
                 
     # Campaign simulation trigger
     if run_btn:
         st.markdown("""
         <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22C55E; padding: 15px; border-radius: 4px; margin-top: 20px;">
-            <p style="margin: 0; color: #22C55E; font-weight: 600;">✅ Successfully simulated campaign action sequence! Final reward calculated dynamically.</p>
+            <p style="margin: 0; color: #22C55E; font-weight: 600;">✅ Marketing simulation complete! The AI has calculated the best action and estimated revenue for this customer.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -555,8 +611,8 @@ if model_loading_success:
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; padding: 20px 0; opacity: 0.5; font-size: 14px;">
-        <p style="margin: 0; font-weight: 600; opacity: 0.7;">Intelligent Customer Behavior Analysis</p>
-        <p style="margin: 5px 0;">Powered by Machine Learning & Reinforcement Learning</p>
+        <p style="margin: 0; font-weight: 600; opacity: 0.7;">Customer Insights Dashboard</p>
+        <p style="margin: 5px 0;">Helping businesses make smarter marketing decisions with AI</p>
         <p style="margin: 0; font-size: 13px;">Developed by <span style="">Shahab Ibrar</span></p>
     </div>
     """, unsafe_allow_html=True)
